@@ -4,6 +4,7 @@ var settings = {
 		width: 980,
 		height: 560
 	},
+	gridSize: 70,
 	player: {
 		boxSize: 50,
 	},
@@ -19,6 +20,13 @@ var ctx = canvas.getContext("2d");
 canvas.width = settings.canvas.width;
 canvas.height = settings.canvas.height;
 
+// grid scale
+var gridScale = {
+	row: undefined,
+	col: undefined
+};
+gridScale.row = canvas.height / settings.gridSize;
+gridScale.col = canvas.width / settings.gridSize;
 
 // declare and initialize player
 var player = {
@@ -77,11 +85,28 @@ function handleKeyEvent() {
 // render canvas
 function renderCanvas() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	drawGrid();
 	drawPlayer();
 	handleKeyEvent();
 	showDevInfo();
 	FPSCounter++;
 	window.requestAnimationFrame(renderCanvas);
+}
+
+function drawGrid() {
+	ctx.beginPath();
+	for(var row = 1; row < gridScale.row; row++) {
+		ctx.moveTo(0, getRowCoord(row));
+		ctx.lineTo(canvas.width, getRowCoord(row));
+	}
+	for(var col = 1; col < gridScale.col; col++) {
+		ctx.moveTo(getColCoord(col), 0);
+		ctx.lineTo(getColCoord(col), canvas.height);
+	}
+	ctx.lineWidth = 1;
+	ctx.setLineDash([5, 5]);
+	ctx.strokeStyle = "rgba(0, 0, 0, 0.8)";
+	ctx.stroke();
 }
 
 function drawPlayer() {
@@ -99,12 +124,16 @@ function drawPlayer() {
 	ctx.rect(x - boxSize / 2, y - boxSize / 2, boxSize, boxSize);
 	// outer border of the player
 	ctx.rect(x - img.width / 2, y + boxSize / 2 - img.height, img.width, img.height);
+	ctx.lineWidth = 2;
+	ctx.setLineDash([]);
+	ctx.strokeStyle = "brown";
 	ctx.stroke();
 }
 
 
 // development information
 var FPSCounter = 0;
+
 setInterval(function() {
 	document.getElementById("FPS").innerHTML = FPSCounter;
 	FPSCounter = 0;
@@ -118,6 +147,14 @@ function showDevInfo() {
 	document.getElementById("playerVelY").innerHTML = player.vel.y.toFixed(2);
 }
 
+
+// tools
+function getRowCoord(row) {
+	return settings.gridSize * row;
+}
+function getColCoord(col) {
+	return settings.gridSize * col;
+}
 
 // execution
 renderCanvas();
