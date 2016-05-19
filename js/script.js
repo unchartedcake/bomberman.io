@@ -20,6 +20,7 @@ var ctx = canvas.getContext("2d");
 canvas.width = settings.canvas.width;
 canvas.height = settings.canvas.height;
 
+
 // grid scale
 var gridScale = {
 	row: undefined,
@@ -27,6 +28,43 @@ var gridScale = {
 };
 gridScale.row = canvas.height / settings.gridSize;
 gridScale.col = canvas.width / settings.gridSize;
+
+
+// map and mapCells
+var map = [];
+
+for(var row = 0; row < gridScale.row; row++) {
+	map[row] = [];
+	for(var col = 0; col < gridScale.col; col++)
+		map[row][col] = new mapCell();
+}
+
+addObstacle(1, 1, "box1", true);
+addObstacle(6, 7, "box2", true);
+
+function mapCell() {
+	this.type = "background";	// background, tile, obstacle
+	this.image = new Image();
+	this.image.src = "img/background.png";
+	this.canBeDestroyed = false;
+}
+
+mapCell.prototype.isPassable = function() {
+	if(this.type == "obstacle") return false;
+	return true;	// background/tile
+};
+
+function addTile(row, col, imgSrc) {
+	map[row][col].type = "tile";
+	map[row][col].image.src = "img/tiles/" + imgSrc + ".png";
+}
+
+function addObstacle(row, col, imgSrc, canBeDestroyed) {
+	map[row][col].type = "obstacle";
+	map[row][col].image.src = "img/obstacles/" + imgSrc + ".png";
+	map[row][col].canBeDestroyed = canBeDestroyed;
+}
+
 
 // declare and initialize player
 var player = {
@@ -85,12 +123,23 @@ function handleKeyEvent() {
 // render canvas
 function renderCanvas() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+	drawMapCell();
 	drawGrid();
 	drawPlayer();
 	handleKeyEvent();
 	showDevInfo();
 	FPSCounter++;
 	window.requestAnimationFrame(renderCanvas);
+}
+
+function drawMapCell() {
+	for(var row = 0; row < gridScale.row; row++)
+		for(var col = 0; col < gridScale.col; col++)
+			ctx.drawImage(
+				map[row][col].image,
+				getColCoord(col),
+				getRowCoord(row)
+			);
 }
 
 function drawGrid() {
@@ -155,6 +204,7 @@ function getRowCoord(row) {
 function getColCoord(col) {
 	return settings.gridSize * col;
 }
+
 
 // execution
 renderCanvas();
