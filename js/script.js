@@ -39,6 +39,8 @@ for(var row = 0; row < gridScale.row; row++) {
 		map[row][col] = new mapCell();
 }
 
+addTile(3, 10, "grass");
+addTile(4, 7, "grass");
 addObstacle(1, 1, "box1", true);
 addObstacle(6, 7, "box2", true);
 
@@ -93,22 +95,22 @@ document.body.addEventListener("keyup", function(event) {
 
 function handleKeyEvent() {
 	// player movement
-	if(keyStatus[38]) {
+	if(keyStatus[38]) {	// key up
 		player.direction = "up";
 		player.vel.x = 0;
 		player.vel.y -= player.acceleration;
 	}
-	if(keyStatus[39]) {
+	if(keyStatus[39]) {	// key right
 		player.direction = "right";
 		player.vel.x += player.acceleration;
 		player.vel.y = 0;
 	}
-	if(keyStatus[40]) {
+	if(keyStatus[40]) {	// key down
 		player.direction = "down";
 		player.vel.x = 0;
 		player.vel.y += player.acceleration;
 	}
-	if(keyStatus[37]) {
+	if(keyStatus[37]) {	// key left
 		player.direction = "left";
 		player.vel.x -= player.acceleration;
 		player.vel.y = 0;
@@ -117,8 +119,47 @@ function handleKeyEvent() {
 	player.pos.y += player.vel.y;
 	player.vel.x *= settings.movement.deceleration;
 	player.vel.y *= settings.movement.deceleration;
+
+	var offset = settings.player.boxSize / 2 + 1;
+	if(isCollision(player.pos.x, player.pos.y)) {
+		switch(player.direction) {
+			case "up":
+				player.pos.y = settings.gridSize * coordY2Row(player.pos.y) + offset;
+				player.vel.y = 0;
+				break;
+			case "right":
+				player.pos.x = settings.gridSize * (coordX2Col(player.pos.x) + 1) - offset;
+				player.vel.x = 0;
+				break;
+			case "down":
+				player.pos.y = settings.gridSize * (coordY2Row(player.pos.y) + 1) - offset;
+				player.vel.y = 0;
+				break;
+			case "left":
+				player.pos.x = settings.gridSize * coordX2Col(player.pos.x) + offset;
+				player.vel.x = 0;
+				break;
+		}
+	}
 }
 
+function isCollision(x, y) {
+	var halfBoxSize = settings.player.boxSize / 2;
+	if(isPassableByPos(x - halfBoxSize, y - halfBoxSize) &&		// top-left
+		isPassableByPos(x + halfBoxSize, y - halfBoxSize) &&	// top-right
+		isPassableByPos(x + halfBoxSize, y + halfBoxSize) &&	// bottom-right
+		isPassableByPos(x - halfBoxSize, y + halfBoxSize)		// bottom-left
+	) return false;
+	return true;
+}
+
+function isPassableByPos(x, y) {
+	// border test
+	if(x < 0 || y < 0 || x >= settings.canvas.width || y >= settings.canvas.height)
+		return false;
+	// obstacle test
+	return map[coordY2Row(y)][coordX2Col(x)].isPassable();
+}
 
 // render canvas
 function renderCanvas() {
@@ -137,20 +178,20 @@ function drawMapCell() {
 		for(var col = 0; col < gridScale.col; col++)
 			ctx.drawImage(
 				map[row][col].image,
-				getColCoord(col),
-				getRowCoord(row)
+				col2CoordX(col),
+				row2CoordY(row)
 			);
 }
 
 function drawGrid() {
 	ctx.beginPath();
 	for(var row = 1; row < gridScale.row; row++) {
-		ctx.moveTo(0, getRowCoord(row));
-		ctx.lineTo(canvas.width, getRowCoord(row));
+		ctx.moveTo(0, row2CoordY(row));
+		ctx.lineTo(canvas.width, row2CoordY(row));
 	}
 	for(var col = 1; col < gridScale.col; col++) {
-		ctx.moveTo(getColCoord(col), 0);
-		ctx.lineTo(getColCoord(col), canvas.height);
+		ctx.moveTo(col2CoordX(col), 0);
+		ctx.lineTo(col2CoordX(col), canvas.height);
 	}
 	ctx.lineWidth = 1;
 	ctx.setLineDash([5, 5]);
@@ -198,13 +239,18 @@ function showDevInfo() {
 
 
 // tools
-function getRowCoord(row) {
+function row2CoordY(row) {
 	return settings.gridSize * row;
 }
-function getColCoord(col) {
+function col2CoordX(col) {
 	return settings.gridSize * col;
 }
-
+function coordY2Row(y) {
+	return (Math.floor(y / settings.gridSize));
+}
+function coordX2Col(x) {
+	return (Math.floor(x / settings.gridSize));
+}
 
 // execution
 renderCanvas();
