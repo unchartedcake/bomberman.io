@@ -9,7 +9,8 @@ var settings = {
 		boxSize: 50,
 	},
 	movement: {
-		deceleration: 0.2
+		deceleration: 0.2,
+		walkCounterThresh: 5
 	}
 }
 
@@ -23,11 +24,9 @@ canvas.height = settings.canvas.height;
 
 // grid scale
 var gridScale = {
-	row: undefined,
-	col: undefined
+	row: canvas.height / settings.gridSize,
+	col: canvas.width / settings.gridSize
 };
-gridScale.row = canvas.height / settings.gridSize;
-gridScale.col = canvas.width / settings.gridSize;
 
 
 // map and mapCells
@@ -79,7 +78,7 @@ var player = {
 		x: 0,
 		y: 0,
 	},
-	acceleration: 10
+	acceleration: 3
 }
 
 
@@ -201,12 +200,32 @@ function drawGrid() {
 	ctx.stroke();
 }
 
+var walkCounter = 0;
 function drawPlayer() {
 	var x = player.pos.x;
 	var y = player.pos.y;
 	var boxSize = settings.player.boxSize;
+
 	var img = new Image();
-	img.src = "img/player/player.png";
+	if(player.direction == "down" || player.direction == "up") {
+		walkCounter = 0;
+		img.src = "img/player/player.png";
+	}
+	else if(player.vel.x > 1e-3) {
+		walkCounter++;
+		img.src = "img/player/walk_r_" + Math.floor(walkCounter / settings.movement.walkCounterThresh) % 11 + ".png";
+	}
+	else if(player.vel.x < -1e-3) {
+		walkCounter++;
+		img.src = "img/player/walk_l_" + Math.floor(walkCounter / settings.movement.walkCounterThresh) % 11 + ".png";
+	}
+	else {
+		walkCounter = 0;
+		if(player.direction == "right")
+			img.src = "img/player/walk_r_0.png";
+		else
+			img.src = "img/player/walk_l_0.png";
+	}
 
 	ctx.drawImage(img, x - img.width / 2, y + boxSize / 2 - img.height);
 	ctx.beginPath();
@@ -233,6 +252,7 @@ setInterval(function() {
 
 function showDevInfo() {
 	document.getElementById("direction").innerHTML = player.direction;
+	document.getElementById("walkingFrame").innerHTML = Math.floor(walkCounter / settings.movement.walkCounterThresh) % 11;
 	document.getElementById("playerPosX").innerHTML = player.pos.x.toFixed(2);
 	document.getElementById("playerPosY").innerHTML = player.pos.y.toFixed(2);
 	document.getElementById("playerVelX").innerHTML = player.vel.x.toFixed(2);
@@ -255,5 +275,50 @@ function coordX2Col(x) {
 }
 
 
+// preload images
+var imgSrcList = [
+	"/background.png",
+	"/obstacles/box1.png",
+	"/obstacles/box2.png",
+	"/player/player.png",
+	"/player/walk_r_0.png",
+	"/player/walk_r_1.png",
+	"/player/walk_r_2.png",
+	"/player/walk_r_3.png",
+	"/player/walk_r_4.png",
+	"/player/walk_r_5.png",
+	"/player/walk_r_6.png",
+	"/player/walk_r_7.png",
+	"/player/walk_r_8.png",
+	"/player/walk_r_9.png",
+	"/player/walk_r_10.png",
+	"/player/walk_l_0.png",
+	"/player/walk_l_1.png",
+	"/player/walk_l_2.png",
+	"/player/walk_l_3.png",
+	"/player/walk_l_4.png",
+	"/player/walk_l_5.png",
+	"/player/walk_l_6.png",
+	"/player/walk_l_7.png",
+	"/player/walk_l_8.png",
+	"/player/walk_l_9.png",
+	"/player/walk_l_10.png",
+	"/tiles/grass.png"
+];
+
+var loadImgCount = 0;
+var loadImgTotal = imgSrcList.length;
+
+for(var i = 0; i < loadImgTotal; i++) {
+	var image = new Image();
+	image.onload = function() {
+		loadImgCount++;
+		if(loadImgCount == loadImgTotal)	//finish loading
+			renderCanvas();
+	};
+	image.src = "img" + imgSrcList[i];
+}
+
+
 // execution
-renderCanvas();
+
