@@ -185,6 +185,7 @@ function drawMapCell() {
 }
 
 function drawGrid() {
+	if(!document.getElementById("showGrid").checked) return;
 	ctx.beginPath();
 	for(var row = 1; row < gridScale.row; row++) {
 		ctx.moveTo(0, row2CoordY(row));
@@ -228,6 +229,8 @@ function drawPlayer() {
 	}
 
 	ctx.drawImage(img, x - img.width / 2, y + boxSize / 2 - img.height);
+
+	if(!document.getElementById("showPlayerBorder").checked) return;
 	ctx.beginPath();
 	// center spot of the player
 	ctx.arc(x, y, 1, 0, 2 * Math.PI);
@@ -318,7 +321,3 @@ for(var i = 0; i < loadImgTotal; i++) {
 	};
 	image.src = "img" + imgSrcList[i];
 }
-
-
-// execution
-
