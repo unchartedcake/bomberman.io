@@ -120,6 +120,7 @@ function handleKeyEvent() {
 	player.vel.x *= settings.movement.deceleration;
 	player.vel.y *= settings.movement.deceleration;
 
+	// detect collision
 	var offset = settings.player.boxSize / 2 + 1;
 	if(isCollision(player.pos.x, player.pos.y)) {
 		switch(player.direction) {
@@ -160,6 +161,7 @@ function isPassableByPos(x, y) {
 	// obstacle test
 	return map[coordY2Row(y)][coordX2Col(x)].isPassable();
 }
+
 
 // render canvas
 function renderCanvas() {
@@ -251,6 +253,7 @@ function coordY2Row(y) {
 function coordX2Col(x) {
 	return (Math.floor(x / settings.gridSize));
 }
+
 
 // execution
 renderCanvas();
