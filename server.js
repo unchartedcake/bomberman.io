@@ -1,17 +1,26 @@
+var ip = '192.168.0.6';
+var port = 1234;
 var server = require('http').createServer(handle);
 var io = require('/usr/local/lib/node_modules/socket.io').listen(server);
 var fs = require('fs');
-
+var path = require('path');
+//handle http request
 function handle(request, response){
-	fs.readFile('./t.html', function readF(err, data) {
-		if (err) throw err;
+	filePath = '.' + request.url;
+	filePath = (filePath == './') ? './index.html' : filePath;
+	ext = path.extname(filePath);
+	if (ext != '.html' && ext != '.js' && ext != '.png'){
+		console.log('someone try to hack!');
+		response.end();
+		return;
+	}
+	fs.readFile(filePath, function(err, data){
+		if(err)
+			throw err;
 		response.end(data);	
 	});
-
 }
-
-var ip = '192.168.0.102';
-var port = 1234;
+//compute
 var value = 0;
 server.listen(port, ip);
 console.log("running on " + ip + " " + port);
@@ -19,7 +28,7 @@ io.sockets.on('connection', function (socket){
 	socket.on('enter', function (username){
 		console.log(username + ' is connected.');
 		socket.username = username;
-		io.sockets.emit('init', value);	
+		io.sockets.emit('init', value);
 	});
 
 	socket.on('click', function(){
