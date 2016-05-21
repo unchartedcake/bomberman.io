@@ -14,6 +14,10 @@ function getPlayer(){
 }
 
 // communicate with server
+function move(dir){
+	socket.emit('move', dir);
+}
+
 socket.on('connect', function(){
 	var username = prompt('Your name?');
 	if (username.length == 0)

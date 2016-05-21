@@ -95,21 +95,25 @@ document.body.addEventListener("keyup", function(event) {
 function handleKeyEvent() {
 	// player movement
 	if(keyStatus[38]) {	// key up
+		move('up');
 		player.direction = "up";
 		player.vel.x = 0;
 		player.vel.y -= player.acceleration;
 	}
 	if(keyStatus[39]) {	// key right
+		move('right');
 		player.direction = "right";
 		player.vel.x += player.acceleration;
 		player.vel.y = 0;
 	}
 	if(keyStatus[40]) {	// key down
+		move('down');
 		player.direction = "down";
 		player.vel.x = 0;
 		player.vel.y += player.acceleration;
 	}
 	if(keyStatus[37]) {	// key left
+		move('left');
 		player.direction = "left";
 		player.vel.x -= player.acceleration;
 		player.vel.y = 0;

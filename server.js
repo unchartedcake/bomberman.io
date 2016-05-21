@@ -35,7 +35,7 @@ var player;
 // server communicate
 server.listen(port, ip);
 console.log("running on " + ip + " " + port);
-io.sockets.on('connection', function (socket){
+io.sockets.on('connection', function(socket){
 	socket.on('enter', function (username){
 		console.log(username + ' is connected.');
 		socket.username = username;
@@ -48,15 +48,11 @@ io.sockets.on('connection', function (socket){
 		value += 1;
 		io.sockets.emit('update', map, player);	
 	});
-/*
-	socket.on('send', function (data){
-		console.log(data);	
-		io.sockets.emit('printMessage', socket.username, data);
+
+	socket.on('move', function(dir){
+		console.log(socket.username + ' moves ' + dir);
 	});
-*/
 	//socket.emit: send to a specific socket
 	//socket.broadcast.emit: send to all socket except this one
 	//io.sockets.emit: send to all socket
-
-
 });
