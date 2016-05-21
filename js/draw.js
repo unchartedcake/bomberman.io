@@ -165,8 +165,10 @@ function isPassableByPos(x, y) {
 // render canvas
 function renderCanvas() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+//	var nmap = getMap();
 	drawMapCell();
 	drawGrid();
+//	var player = getPlayer();
 	drawPlayer();
 	handleKeyEvent();
 	showDevInfo();

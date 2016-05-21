@@ -4,7 +4,8 @@ var server = require('http').createServer(handle);
 var io = require('/usr/local/lib/node_modules/socket.io').listen(server);
 var fs = require('fs');
 var path = require('path');
-//handle http request
+
+// handle http request
 function handle(request, response){
 	filePath = '.' + request.url;
 	filePath = (filePath == './') ? './index.html' : filePath;
@@ -20,22 +21,32 @@ function handle(request, response){
 		response.end(data);	
 	});
 }
-//compute
-var value = 0;
+
+// compute
+var map = [];
+var player;
+
+
+
+
+
+
+
+// server communicate
 server.listen(port, ip);
 console.log("running on " + ip + " " + port);
 io.sockets.on('connection', function (socket){
 	socket.on('enter', function (username){
 		console.log(username + ' is connected.');
 		socket.username = username;
-		io.sockets.emit('init', value);
+		io.sockets.emit('update', map, player);
 	});
 
-	socket.on('click', function(){
+	socket.on('up', function(){
 		var username = socket.username;
-		console.log(username + ' clicked.');
+		console.log(username + ' moved up.');
 		value += 1;
-		io.sockets.emit('update', value);	
+		io.sockets.emit('update', map, player);	
 	});
 /*
 	socket.on('send', function (data){
