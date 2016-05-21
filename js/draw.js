@@ -162,14 +162,17 @@ function isPassableByPos(x, y) {
 	if(x < 0 || y < 0 || x >= settings.canvas.width || y >= settings.canvas.height)
 		return false;
 	// obstacle test
-	return map[coordY2Row(y)][coordX2Col(x)].isPassable();
+	//some bug here, seems that map return by server can't contain function
+	//TODO: change isPassable to boooooo!lean
+	//return map[coordY2Row(y)][coordX2Col(x)].isPassable();
+	return true;
 }
 
 
 // render canvas
 function renderCanvas() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-//	var nmap = getMap();
+	map = getMap();
 	drawMapCell();
 	drawGrid();
 //	var player = getPlayer();
@@ -179,15 +182,22 @@ function renderCanvas() {
 	FPSCounter++;
 	window.requestAnimationFrame(renderCanvas);
 }
-
+// BH TODO: draw mapCell image by mapCell.type
+var a = new Image();
+a.src = 'img/background.png';
+var b = new Image();
+b.src = 'img/obstacles/box1.png';
 function drawMapCell() {
 	for(var row = 0; row < gridScale.row; row++)
-		for(var col = 0; col < gridScale.col; col++)
+		for(var col = 0; col < gridScale.col; col++){
+			// BH TODO: draw mapCell image by mapCell.type
+			var img = (map[row][col].type == 'obstacle') ? b : a;
 			ctx.drawImage(
-				map[row][col].image,
+				img,
 				col2CoordX(col),
 				row2CoordY(row)
 			);
+		}
 }
 
 function drawGrid() {
