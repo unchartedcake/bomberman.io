@@ -1,4 +1,4 @@
-var ip = '10.5.7.1';
+var ip = '192.168.0.6';
 var port = 1234;
 var server = require('http').createServer(handle);
 var io = require('/usr/local/lib/node_modules/socket.io').listen(server);
@@ -86,6 +86,21 @@ addObstacle(1, 1, "box1", true);
 addObstacle(6, 7, "box2", true);
 
 // init player
+var playerList = [];
+function Player(username){
+	this.name = username;
+	this.direction = 'down';
+	this.pos = {
+		x: 50,
+		y: 50
+	}
+	this.vel = {
+		x: 0,
+		y: 0
+	}
+	this.acceleration = 3;
+}
+/*
 var player = {
 	direction: "down",
 	pos: {
@@ -98,6 +113,7 @@ var player = {
 	},
 	acceleration: 3
 }
+*/
 function isPassableByPos(x, y) {
 	// border test
 	if(x < 0 || y < 0 || x >= settings.canvas.width || y >= settings.canvas.height)
@@ -114,7 +130,7 @@ function isCollision(x, y) {
 	) return false;
 	return true;
 }
-function movePlayer(dir){
+function movePlayer(player, dir){
 	// player movement
 	switch (dir){
 	case 'up':	// key up
@@ -167,26 +183,30 @@ function movePlayer(dir){
 	}
 }
 
+function updatePlayerList(player){
+	for (var i = 0; i < playerList.length; i++)
+		if (playerList[i].name == player.name){
+			playerList[i] = player;
+			return;
+		}
+}
+
 // server communicate
 server.listen(port, ip);
 console.log("running on " + ip + " " + port);
 io.sockets.on('connection', function(socket){
 	socket.on('enter', function (username){
 		console.log(username + ' is connected.');
-		socket.username = username;
-		io.sockets.emit('update', map, player);
-	});
-
-	socket.on('up', function(){
-		var username = socket.username;
-		console.log(username + ' moved up.');
-		io.sockets.emit('update', map, player);	
+		socket.player = new Player(username);
+		playerList.push(socket.player);
+		io.sockets.emit('update', map, playerList);
 	});
 
 	socket.on('move', function(dir){
-		console.log(socket.username + ' moves ' + dir);
-		movePlayer(dir);
-		io.sockets.emit('update', map, player);	
+		console.log(socket.player.name + ' moves ' + dir);
+		movePlayer(socket.player, dir);
+		updatePlayerList(socket.player);
+		io.sockets.emit('update', map, playerList);	
 	});
 	//socket.emit: send to a specific socket
 	//socket.broadcast.emit: send to all socket except this one

@@ -1,4 +1,4 @@
-var ip = '10.5.7.1';
+var ip = '192.168.0.6';
 var port = '1234';
 var socket = io.connect('http://' + ip + ':' + port);
 
@@ -27,6 +27,7 @@ for(var row = 0; row < gridScale.row; row++) {
 		oldMap[row][col] = new mapCell();
 }
 // player
+var oldPlayerList = [];
 var oldPlayer = {
 	direction: "down",
 	pos: {
@@ -39,13 +40,14 @@ var oldPlayer = {
 	},
 	acceleration: 3
 }
+//oldPlayerList.push(oldPlayer);
 
 function getMap(){
 	return oldMap;
 }
 
-function getPlayer(){
-	return oldPlayer;
+function getPlayerList(){
+	return oldPlayerList;
 }
 
 // communicate with server
@@ -60,8 +62,8 @@ socket.on('connect', function(){
 	socket.emit('enter', username);
 });
 
-socket.on('update', function(newMap, newPlayer){
+socket.on('update', function(newMap, newPlayerList){
 	//alert('map update');
 	oldMap = newMap;
-	oldPlayer = newPlayer;
+	oldPlayerList = newPlayerList;
 });

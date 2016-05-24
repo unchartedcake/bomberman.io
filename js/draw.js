@@ -173,8 +173,11 @@ function renderCanvas() {
 	map = getMap();
 	drawMapCell();
 	drawGrid();
-	player = getPlayer();
-	drawPlayer();
+	var playerList = [];
+	playerList = getPlayerList();
+	for (var i = 0; i < playerList.length; i++){
+		drawPlayer(playerList[i]);
+	}
 	handleKeyEvent();
 	showDevInfo();
 	FPSCounter++;
@@ -216,27 +219,29 @@ function drawGrid() {
 }
 
 var walkCounter = 0;
-function drawPlayer() {
-	var x = player.pos.x;
-	var y = player.pos.y;
+function drawPlayer(playerT) {
+	document.getElementById("playerVelX").innerHTML = playerT.vel.x;
+	document.getElementById("playerVelY").innerHTML = playerT.vel.y;
+	var x = playerT.pos.x;
+	var y = playerT.pos.y;
 	var boxSize = settings.player.boxSize;
 
 	var img = new Image();
-	if(player.direction == "down" || player.direction == "up") {
+	if(playerT.direction == "down" || playerT.direction == "up") {
 		walkCounter = 0;
 		img.src = "img/player/player.png";
 	}
-	else if(player.vel.x > 1e-3) {
+	else if(playerT.vel.x > 1e-3) {
 		walkCounter++;
 		img.src = "img/player/walk_r_" + Math.floor(walkCounter / settings.movement.walkCounterThresh) % 11 + ".png";
 	}
-	else if(player.vel.x < -1e-3) {
+	else if(playerT.vel.x < -1e-3) {
 		walkCounter++;
 		img.src = "img/player/walk_l_" + Math.floor(walkCounter / settings.movement.walkCounterThresh) % 11 + ".png";
 	}
 	else {
 		walkCounter = 0;
-		if(player.direction == "right")
+		if(playerT.direction == "right")
 			img.src = "img/player/walk_r_0.png";
 		else
 			img.src = "img/player/walk_l_0.png";
@@ -272,8 +277,7 @@ function showDevInfo() {
 	document.getElementById("walkingFrame").innerHTML = Math.floor(walkCounter / settings.movement.walkCounterThresh) % 11;
 	document.getElementById("playerPosX").innerHTML = player.pos.x.toFixed(2);
 	document.getElementById("playerPosY").innerHTML = player.pos.y.toFixed(2);
-	document.getElementById("playerVelX").innerHTML = player.vel.x.toFixed(2);
-	document.getElementById("playerVelY").innerHTML = player.vel.y.toFixed(2);
+
 }
 
 
