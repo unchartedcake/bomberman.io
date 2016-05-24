@@ -1,85 +1,19 @@
-// global settings
-var settings = {
-	canvas: {
-		width: 980,
-		height: 560
-	},
-	gridSize: 70,
-	player: {
-		boxSize: 50,
-	},
-	movement: {
-		deceleration: 0.2,
-		walkCounterThresh: 5
-	}
-}
+/* todo:
+ * devInfo, imgReady, renderByMapCellType
+ */
+
+// movement settings
+settings.movement = {
+	deceleration: 0.2,
+	walkCounterThresh: 5
+};
 
 
 // initialize properties related to canvas
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
-canvas.width = settings.canvas.width;
-canvas.height = settings.canvas.height;
 
-
-// grid scale
-var gridScale = {
-	row: canvas.height / settings.gridSize,
-	col: canvas.width / settings.gridSize
-};
-
-
-// map and mapCells
-var map = [];
-
-for(var row = 0; row < gridScale.row; row++) {
-	map[row] = [];
-	for(var col = 0; col < gridScale.col; col++)
-		map[row][col] = new mapCell();
-}
-
-addTile(3, 10, "grass");
-addTile(4, 7, "grass");
-addObstacle(1, 1, "box1", true);
-addObstacle(6, 7, "box2", true);
-
-function mapCell() {
-	this.type = "background";	// background, tile, obstacle
-	this.image = new Image();
-	this.image.src = "img/background.png";
-	this.canBeDestroyed = false;
-}
-
-mapCell.prototype.isPassable = function() {
-	if(this.type == "obstacle") return false;
-	return true;	// background/tile
-};
-
-function addTile(row, col, imgSrc) {
-	map[row][col].type = "tile";
-	map[row][col].image.src = "img/tiles/" + imgSrc + ".png";
-}
-
-function addObstacle(row, col, imgSrc, canBeDestroyed) {
-	map[row][col].type = "obstacle";
-	map[row][col].image.src = "img/obstacles/" + imgSrc + ".png";
-	map[row][col].canBeDestroyed = canBeDestroyed;
-}
-
-
-// declare and initialize player
-var player = {
-	direction: "down",
-	pos: {
-		x: 50,
-		y: 50
-	},
-	vel: {	// velocity
-		x: 0,
-		y: 0,
-	},
-	acceleration: 3
-}
+/* I just finish reviewing code here */
 
 
 // player controlling
@@ -124,23 +58,23 @@ function handleKeyEvent() {
 	player.vel.y *= settings.movement.deceleration;
 
 	// detect collision
-	var offset = settings.player.boxSize / 2 + 1;
+	var offset = playerBoxSize / 2 + 1;
 	if(isCollision(player.pos.x, player.pos.y)) {
 		switch(player.direction) {
 			case "up":
-				player.pos.y = settings.gridSize * coordY2Row(player.pos.y) + offset;
+				player.pos.y = gridSize * coordY2Row(player.pos.y) + offset;
 				player.vel.y = 0;
 				break;
 			case "right":
-				player.pos.x = settings.gridSize * (coordX2Col(player.pos.x) + 1) - offset;
+				player.pos.x = gridSize * (coordX2Col(player.pos.x) + 1) - offset;
 				player.vel.x = 0;
 				break;
 			case "down":
-				player.pos.y = settings.gridSize * (coordY2Row(player.pos.y) + 1) - offset;
+				player.pos.y = gridSize * (coordY2Row(player.pos.y) + 1) - offset;
 				player.vel.y = 0;
 				break;
 			case "left":
-				player.pos.x = settings.gridSize * coordX2Col(player.pos.x) + offset;
+				player.pos.x = gridSize * coordX2Col(player.pos.x) + offset;
 				player.vel.x = 0;
 				break;
 		}
@@ -152,12 +86,11 @@ function isPassableByPos(x, y) {
 	if(x < 0 || y < 0 || x >= settings.canvas.width || y >= settings.canvas.height)
 		return false;
 	// obstacle test
-	//return map[coordY2Row(y)][coordX2Col(x)].isPassable();
-	return true;
+	return map[coordY2Row(y)][coordX2Col(x)].isPassable();
 }
 
 function isCollision(x, y) {
-	var halfBoxSize = settings.player.boxSize / 2;
+	var halfBoxSize = playerBoxSize / 2;
 	if(isPassableByPos(x - halfBoxSize, y - halfBoxSize) &&		// top-left
 		isPassableByPos(x + halfBoxSize, y - halfBoxSize) &&	// top-right
 		isPassableByPos(x + halfBoxSize, y + halfBoxSize) &&	// bottom-right
@@ -169,11 +102,13 @@ function isCollision(x, y) {
 
 // render canvas
 function renderCanvas() {
+	canvas.width = settings.canvas.width;
+	canvas.height = settings.canvas.height;
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-	map = getMap();
+	//map = getMap();
 	drawMapCell();
 	drawGrid();
-	player = getPlayer();
+	//player = getPlayer();
 	drawPlayer();
 	handleKeyEvent();
 	showDevInfo();
@@ -186,8 +121,8 @@ a.src = 'img/background.png';
 var b = new Image();
 b.src = 'img/obstacles/box1.png';
 function drawMapCell() {
-	for(var row = 0; row < gridScale.row; row++)
-		for(var col = 0; col < gridScale.col; col++){
+	for(var row = 0; row < settings.gridScale.row; row++)
+		for(var col = 0; col < settings.gridScale.col; col++){
 			// BH TODO: draw mapCell image by mapCell.type
 			var img = (map[row][col].type == 'obstacle') ? b : a;
 			ctx.drawImage(
@@ -199,13 +134,12 @@ function drawMapCell() {
 }
 
 function drawGrid() {
-	if(!document.getElementById("showGrid").checked) return;
 	ctx.beginPath();
-	for(var row = 1; row < gridScale.row; row++) {
+	for(var row = 1; row < settings.gridScale.row; row++) {
 		ctx.moveTo(0, row2CoordY(row));
 		ctx.lineTo(canvas.width, row2CoordY(row));
 	}
-	for(var col = 1; col < gridScale.col; col++) {
+	for(var col = 1; col < settings.gridScale.col; col++) {
 		ctx.moveTo(col2CoordX(col), 0);
 		ctx.lineTo(col2CoordX(col), canvas.height);
 	}
@@ -219,7 +153,6 @@ var walkCounter = 0;
 function drawPlayer() {
 	var x = player.pos.x;
 	var y = player.pos.y;
-	var boxSize = settings.player.boxSize;
 
 	var img = new Image();
 	if(player.direction == "down" || player.direction == "up") {
@@ -242,16 +175,19 @@ function drawPlayer() {
 			img.src = "img/player/walk_l_0.png";
 	}
 
-	ctx.drawImage(img, x - img.width / 2, y + boxSize / 2 - img.height);
+	ctx.drawImage(
+		img,
+		x - img.width * zoom / 2,
+		y + playerBoxSize / 2 - img.height * zoom,
+		img.width * zoom,
+		img.height * zoom
+	);
 
-	if(!document.getElementById("showPlayerBorder").checked) return;
 	ctx.beginPath();
 	// center spot of the player
 	ctx.arc(x, y, 1, 0, 2 * Math.PI);
 	// box model of the player
-	ctx.rect(x - boxSize / 2, y - boxSize / 2, boxSize, boxSize);
-	// outer border of the player
-	ctx.rect(x - img.width / 2, y + boxSize / 2 - img.height, img.width, img.height);
+	ctx.rect(x - playerBoxSize / 2, y - playerBoxSize / 2, playerBoxSize, playerBoxSize);
 	ctx.lineWidth = 2;
 	ctx.setLineDash([]);
 	ctx.strokeStyle = "brown";
@@ -279,16 +215,16 @@ function showDevInfo() {
 
 // tools
 function row2CoordY(row) {
-	return settings.gridSize * row;
+	return gridSize * row;
 }
 function col2CoordX(col) {
-	return settings.gridSize * col;
+	return gridSize * col;
 }
 function coordY2Row(y) {
-	return (Math.floor(y / settings.gridSize));
+	return (Math.floor(y / gridSize));
 }
 function coordX2Col(x) {
-	return (Math.floor(x / settings.gridSize));
+	return (Math.floor(x / gridSize));
 }
 
 
