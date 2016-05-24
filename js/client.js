@@ -55,7 +55,7 @@ function move(dir){
 
 socket.on('connect', function(){
 	var username = prompt('Your name?');
-	if (username.length == 0)
+	if (username == null)
 		username = 'Mr.Uknown';
 	socket.emit('enter', username);
 });
