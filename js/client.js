@@ -87,10 +87,10 @@ function move(dir) {
 	//socket.emit('move', dir);
 }
 
-/*
+
 socket.on('connect', function(){
 	var username = prompt('Your name?');
-	if (username.length == 0)
+	if (username == null)
 		username = 'Mr.Uknown';
 	socket.emit('enter', username);
 });
@@ -100,7 +100,7 @@ socket.on('update', function(newMap, newPlayer){
 	clientMap = newMap;
 	clientPlayer = newPlayer;
 });
-*/
+
 
 // other tools
 function min(a, b) {
