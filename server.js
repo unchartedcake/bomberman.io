@@ -1,4 +1,4 @@
-var ip = '192.168.0.6';
+var ip = '10.5.7.1';
 var port = 1234;
 var server = require('http').createServer(handle);
 var io = require('/usr/local/lib/node_modules/socket.io').listen(server);
@@ -43,6 +43,19 @@ var gridScale = {
 	row: settings.canvas.height / settings.gridSize,
 	col: settings.canvas.width / settings.gridSize
 };
+// tools
+function row2CoordY(row) {
+	return settings.gridSize * row;
+}
+function col2CoordX(col) {
+	return settings.gridSize * col;
+}
+function coordY2Row(y) {
+	return (Math.floor(y / settings.gridSize));
+}
+function coordX2Col(x) {
+	return (Math.floor(x / settings.gridSize));
+}
 
 // init map
 var map = [];
@@ -72,15 +85,87 @@ addTile(4, 7, "grass");
 addObstacle(1, 1, "box1", true);
 addObstacle(6, 7, "box2", true);
 
-
 // init player
-var player;
+var player = {
+	direction: "down",
+	pos: {
+		x: 50,
+		y: 50
+	},
+	vel: {	// velocity
+		x: 0,
+		y: 0,
+	},
+	acceleration: 3
+}
+function isPassableByPos(x, y) {
+	// border test
+	if(x < 0 || y < 0 || x >= settings.canvas.width || y >= settings.canvas.height)
+		return false;
+	// obstacle test
+	return map[coordY2Row(y)][coordX2Col(x)].isPassable();
+}
+function isCollision(x, y) {
+	var halfBoxSize = settings.player.boxSize / 2;
+	if(isPassableByPos(x - halfBoxSize, y - halfBoxSize) &&		// top-left
+		isPassableByPos(x + halfBoxSize, y - halfBoxSize) &&	// top-right
+		isPassableByPos(x + halfBoxSize, y + halfBoxSize) &&	// bottom-right
+		isPassableByPos(x - halfBoxSize, y + halfBoxSize)		// bottom-left
+	) return false;
+	return true;
+}
+function movePlayer(dir){
+	// player movement
+	switch (dir){
+	case 'up':	// key up
+		player.direction = "up";
+		player.vel.x = 0;
+		player.vel.y -= player.acceleration;
+		break;
+	case 'right':	// key right
+		player.direction = "right";
+		player.vel.x += player.acceleration;
+		player.vel.y = 0;
+		break;
+	case 'down':	// key down
+		player.direction = "down";
+		player.vel.x = 0;
+		player.vel.y += player.acceleration;
+		break;
+	case 'left':	// key left
+		player.direction = "left";
+		player.vel.x -= player.acceleration;
+		player.vel.y = 0;
+		break;
+	}
+	player.pos.x += player.vel.x;
+	player.pos.y += player.vel.y;
+	player.vel.x *= settings.movement.deceleration;
+	player.vel.y *= settings.movement.deceleration;
 
-
-
-
-
-
+	// detect collision
+	var offset = settings.player.boxSize / 2 + 1;
+	if (isCollision(player.pos.x, player.pos.y)) {
+		switch(player.direction) {
+			case "up":
+				player.pos.y = settings.gridSize * coordY2Row(player.pos.y) + offset;
+				player.vel.y = 0;
+				break;
+			case "right":
+				player.pos.x = settings.gridSize * (coordX2Col(player.pos.x) + 1) - offset;
+				player.vel.x = 0;
+				break;
+			case "down":
+				player.pos.y = settings.gridSize * (coordY2Row(player.pos.y) + 1) - offset;
+				player.vel.y = 0;
+				break;
+			case "left":
+				player.pos.x = settings.gridSize * coordX2Col(player.pos.x) + offset;
+				player.vel.x = 0;
+				break;
+		}
+	}
+}
 
 // server communicate
 server.listen(port, ip);
@@ -95,12 +180,13 @@ io.sockets.on('connection', function(socket){
 	socket.on('up', function(){
 		var username = socket.username;
 		console.log(username + ' moved up.');
-		value += 1;
 		io.sockets.emit('update', map, player);	
 	});
 
 	socket.on('move', function(dir){
 		console.log(socket.username + ' moves ' + dir);
+		movePlayer(dir);
+		io.sockets.emit('update', map, player);	
 	});
 	//socket.emit: send to a specific socket
 	//socket.broadcast.emit: send to all socket except this one

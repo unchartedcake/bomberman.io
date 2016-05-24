@@ -147,6 +147,15 @@ function handleKeyEvent() {
 	}
 }
 
+function isPassableByPos(x, y) {
+	// border test
+	if(x < 0 || y < 0 || x >= settings.canvas.width || y >= settings.canvas.height)
+		return false;
+	// obstacle test
+	//return map[coordY2Row(y)][coordX2Col(x)].isPassable();
+	return true;
+}
+
 function isCollision(x, y) {
 	var halfBoxSize = settings.player.boxSize / 2;
 	if(isPassableByPos(x - halfBoxSize, y - halfBoxSize) &&		// top-left
@@ -157,17 +166,6 @@ function isCollision(x, y) {
 	return true;
 }
 
-function isPassableByPos(x, y) {
-	// border test
-	if(x < 0 || y < 0 || x >= settings.canvas.width || y >= settings.canvas.height)
-		return false;
-	// obstacle test
-	//some bug here, seems that map return by server can't contain function
-	//TODO: change isPassable to boooooo!lean
-	//return map[coordY2Row(y)][coordX2Col(x)].isPassable();
-	return true;
-}
-
 
 // render canvas
 function renderCanvas() {
@@ -175,7 +173,7 @@ function renderCanvas() {
 	map = getMap();
 	drawMapCell();
 	drawGrid();
-//	var player = getPlayer();
+	player = getPlayer();
 	drawPlayer();
 	handleKeyEvent();
 	showDevInfo();
