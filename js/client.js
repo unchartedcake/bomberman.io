@@ -1,57 +1,77 @@
+// connection
 var ip = '192.168.0.6';
 var port = '1234';
 var socket = io.connect('http://' + ip + ':' + port);
 
-// settings
+// settings related to canvas and grid
 var settings = {
 	canvas: {
-		width: 980,
-		height: 560
+		width: undefined,
+		height: undefined
 	},
-	gridSize: 70
+	gridScale: {
+		row: 8,
+		col: 14
+	}
 }
-// grid scale
-var gridScale = {
-	row: settings.canvas.height / settings.gridSize,
-	col: settings.canvas.width / settings.gridSize
+var gridSize = getGridSize();
+var zoom = gridSize / 70;
+var playerBoxSize = 50 * zoom;
+
+window.onresize = function() {
+	settings.canvas.width = gridSize * settings.gridScale.col;
+	settings.canvas.height = gridSize * settings.gridScale.row;
+	gridSize = getGridSize();
+	zoom = gridSize / 70;
+	playerBoxSize = 50 * zoom;
 };
+
+function getGridSize() {
+	var size = min(
+		window.innerWidth / settings.gridScale.col,
+		window.innerHeight / settings.gridScale.row
+	);
+	if(size > 70) size = 70;
+	return size;
+}
+
+settings.canvas.width = gridSize * settings.gridScale.col;
+settings.canvas.height = gridSize * settings.gridScale.row;
+
+
 // map
-var oldMap = [];
 function mapCell() {
 	this.type = "background";	// background, tile, obstacle
+	this.subType = "none";
 	this.canBeDestroyed = false;
 }
-for(var row = 0; row < gridScale.row; row++) {
-	oldMap[row] = [];
-	for(var col = 0; col < gridScale.col; col++)
-		oldMap[row][col] = new mapCell();
+
+mapCell.prototype.isPassable = function() {
+	if(this.type == "obstacle") return false;
+	return true;	// background/tile
+};
+
+var clientMap = [];
+for(var row = 0; row < settings.gridScale.row; row++) {
+	clientMap[row] = [];
+	for(var col = 0; col < settings.gridScale.col; col++)
+		clientMap[row][col] = new mapCell();
 }
+
+function getMap() {
+	return clientMap;
+}
+
+
 // player
-var oldPlayerList = [];
-var oldPlayer = {
-	direction: "down",
-	pos: {
-		x: 50,
-		y: 50
-	},
-	vel: {	// velocity
-		x: 0,
-		y: 0,
-	},
-	acceleration: 3
-}
-//oldPlayerList.push(oldPlayer);
+var clientPlayerList = [];
 
-function getMap(){
-	return oldMap;
-}
-
-function getPlayerList(){
-	return oldPlayerList;
+function getPlayerList() {
+	return clientPlayerList;
 }
 
 // communicate with server
-function move(dir){
+function move(dir) {
 	socket.emit('move', dir);
 }
 
@@ -64,6 +84,11 @@ socket.on('connect', function(){
 
 socket.on('update', function(newMap, newPlayerList){
 	//alert('map update');
-	oldMap = newMap;
-	oldPlayerList = newPlayerList;
+	clientMap = newMap;
+	clientPlayerList = newPlayerList;
 });
+
+// other tools
+function min(a, b) {
+	return (a < b) ? a : b;
+}
