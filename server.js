@@ -87,6 +87,15 @@ addObstacle(6, 7, "box2", true);
 
 // init player
 var playerList = [];
+// decelerate every 0.02s
+setInterval(function(){
+	for (var i = 0; i < playerList.length; i++){
+		playerList[i].vel.x *= settings.movement.deceleration;
+		playerList[i].vel.y *= settings.movement.deceleration;
+	}
+	io.sockets.emit('update', map, playerList);	
+}, 20);
+
 function Player(username){
 	this.name = username;
 	this.direction = 'down';
@@ -100,20 +109,6 @@ function Player(username){
 	}
 	this.acceleration = 3;
 }
-/*
-var player = {
-	direction: "down",
-	pos: {
-		x: 50,
-		y: 50
-	},
-	vel: {	// velocity
-		x: 0,
-		y: 0,
-	},
-	acceleration: 3
-}
-*/
 function isPassableByPos(x, y) {
 	// border test
 	if(x < 0 || y < 0 || x >= settings.canvas.width || y >= settings.canvas.height)
@@ -156,8 +151,6 @@ function movePlayer(player, dir){
 	}
 	player.pos.x += player.vel.x;
 	player.pos.y += player.vel.y;
-	player.vel.x *= settings.movement.deceleration;
-	player.vel.y *= settings.movement.deceleration;
 
 	// detect collision
 	var offset = settings.player.boxSize / 2 + 1;
