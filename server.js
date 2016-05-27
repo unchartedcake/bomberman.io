@@ -59,26 +59,29 @@ function coordX2Col(x) {
 
 // init map
 var map = [];
-function mapCell() {
+function MapCell() {
 	this.type = "background";	// background, tile, obstacle
+	this.subType = "none";
 	this.canBeDestroyed = false;
 }
-mapCell.prototype.isPassable = function() {
+MapCell.prototype.isPassable = function() {
 	if(this.type == "obstacle") return false;
 	return true;	// background/tile
 };
-function addTile(row, col, imgSrc) {
+function addTile(row, col, subType) {
 	map[row][col].type = "tile";
+	map[row][col].subType = subType;
 }
 
-function addObstacle(row, col, imgSrc) {
+function addObstacle(row, col, subType, canBeDestroyed) {
 	map[row][col].type = "obstacle";
+	map[row][col].subType = subType;
 	map[row][col].canBeDestroyed = canBeDestroyed;
 }
 for(var row = 0; row < gridScale.row; row++) {
 	map[row] = [];
 	for(var col = 0; col < gridScale.col; col++)
-		map[row][col] = new mapCell();
+		map[row][col] = new MapCell();
 }
 addTile(3, 10, "grass");
 addTile(4, 7, "grass");

@@ -1,6 +1,7 @@
 function MapCell() {
 	this.type = "background";	// background(default), tile, obstacle
 	this.subType = "none";
+	this.canBeDestroyed = false;
 }
 
 var localMap = [];
@@ -15,9 +16,10 @@ function addTile(row, col, subType) {
 	localMap[row][col].subType = subType;
 }
 
-function addObstacle(row, col, subType) {
+function addObstacle(row, col, subType, canBeDestroyed) {
 	localMap[row][col].type = "obstacle";
 	localMap[row][col].subType = subType;
+	localMap[row][col].canBeDestroyed = canBeDestroyed;
 }
 
 addTile(1, 1, "grass");
