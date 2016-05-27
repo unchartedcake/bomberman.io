@@ -20,7 +20,7 @@ function addObstacle(row, col, subType) {
 	localMap[row][col].subType = subType;
 }
 
-addObstacle(3, 10, "box");
-addObstacle(4, 7, "box");
-addObstacle(1, 1, "box");
-addObstacle(6, 7, "box");
+addTile(1, 1, "grass");
+addTile(6, 7, "grass");
+addObstacle(3, 10, "box1");
+addObstacle(4, 7, "box2");

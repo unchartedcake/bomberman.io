@@ -1,4 +1,5 @@
 var player = {
+	name: "Eugene",
 	direction: "down",
 	pos: {
 		x: 200,

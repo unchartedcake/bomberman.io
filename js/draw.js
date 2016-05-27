@@ -102,17 +102,40 @@ function renderCanvas() {
 	window.requestAnimationFrame(renderCanvas);
 }
 
+
 // NEED TO BE MODIFIED (img.src part)
 var img_background = new Image();
 img_background.src = "img/background.png";
 var img_box = new Image();
-img_box.src = "img/obstacles/box1.png";
+img_box.src = "img/obstacle/box1.png";
 
-function drawMap() {
+function drawMap() {	// not a good method
 	for(var row = 0; row < settings.gridScale.row; row++)
 		for(var col = 0; col < settings.gridScale.col; col++) {
 			var img = (map[row][col].type == "background")?  img_background : img_box;
-			ctx.drawImage(img, col2CoordX(col), row2CoordY(row));
+			var type = map[row][col].type;
+			var subType = map[row][col].subType;
+			if(type == "background") {
+				ctx.drawImage(
+					imgReady[imgIndex["background"]],
+					col2CoordX(col), row2CoordY(row),
+					gridSize, gridSize
+				);
+			}
+			else if(type == "tile") {
+				ctx.drawImage(
+					imgReady[imgIndex.tile[subType]],
+					col2CoordX(col), row2CoordY(row),
+					gridSize, gridSize
+				);
+			}
+			else {
+				ctx.drawImage(
+					imgReady[imgIndex.obstacle[subType]],
+					col2CoordX(col), row2CoordY(row),
+					gridSize, gridSize
+				);
+			}
 		}
 }
 
@@ -167,6 +190,9 @@ function drawPlayer(p) {
 		img.width * zoomRatio,
 		img.height * zoomRatio
 	);
+	ctx.font = "14px Arial"; 
+	ctx.textAlign = "center";
+	ctx.fillText(p.name, x * zoomRatio, (y + boxSize / 2 + 14) * zoomRatio);
 
 	if(!document.getElementById("showPlayerBorder").checked) return;
 	ctx.beginPath();
@@ -216,5 +242,64 @@ function coordX2Col(x) {
 	return (Math.floor(x / 70));
 }
 
-// execution
-renderCanvas();
+
+// preload images and execute
+var imgSrcList = [
+	"/background.png",		// 0, default background image
+	"/player/player.png",
+	"/player/walk_l_0.png",
+	"/player/walk_l_1.png",
+	"/player/walk_l_2.png",
+	"/player/walk_l_3.png",	// 5
+	"/player/walk_l_4.png",
+	"/player/walk_l_5.png",
+	"/player/walk_l_6.png",
+	"/player/walk_l_7.png",
+	"/player/walk_l_8.png",	// 10
+	"/player/walk_l_9.png",
+	"/player/walk_l_10.png",
+	"/player/walk_r_0.png",
+	"/player/walk_r_1.png",
+	"/player/walk_r_2.png",	// 15
+	"/player/walk_r_3.png",
+	"/player/walk_r_4.png",
+	"/player/walk_r_5.png",
+	"/player/walk_r_6.png",
+	"/player/walk_r_7.png",	// 20
+	"/player/walk_r_8.png",
+	"/player/walk_r_9.png",
+	"/player/walk_r_10.png",
+	"/obstacle/box1.png",
+	"/obstacle/box2.png",	// 25
+	"/tile/grass.png"
+];
+var imgReady = [];
+var imgIndex = {
+	background: 0,
+	player: {
+		face: 1,
+		leftFirstFrame: 2,
+		rightFirstFrame: 13
+	},
+	obstacle: {
+		box1: 24,
+		box2: 25,
+	},
+	tile: {
+		grass: 26
+	}
+};
+
+var loadImgCount = 0;
+var loadImgTotal = imgSrcList.length;
+
+for(var i = 0; i < loadImgTotal; i++) {
+	var image = new Image();
+	image.onload = function() {
+		loadImgCount++;
+		if(loadImgCount == loadImgTotal)	// finish loading
+			renderCanvas();
+	};
+	image.src = "img" + imgSrcList[i];
+	imgReady[i] = image;
+}
