@@ -66,10 +66,16 @@ resizeCanvas();
 
 // map
 var clientMap = [];
+
+function MapCell() {
+	this.type = "background";	// background(default), tile, obstacle
+	this.subType = "none";
+}
+
 for(var row = 0; row < settings.gridScale.row; row++) {
 	clientMap[row] = [];
 	for(var col = 0; col < settings.gridScale.col; col++)
-		clientMap[row][col];
+		clientMap[row][col] = new MapCell();
 }
 
 function updateMap() {	// WHAT'S THIS?
