@@ -220,6 +220,7 @@ setInterval(function() {
 
 function showDevInfo() {
 	document.getElementById("direction").innerHTML = player.direction;
+	document.getElementById("zoomRatio").innerHTML = Math.floor(zoomRatio * 100) + "%";
 	document.getElementById("walkingFrame").innerHTML = Math.floor(walkCounter / settings.movement.walkCounterThresh) % 11;
 	document.getElementById("playerPosX").innerHTML = player.pos.x.toFixed(2);
 	document.getElementById("playerPosY").innerHTML = player.pos.y.toFixed(2);
