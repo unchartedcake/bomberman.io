@@ -225,8 +225,8 @@ function showDevInfo() {
 	document.getElementById("walkingFrame").innerHTML = Math.floor(walkCounter / settings.movement.walkCounterThresh) % 11;
 	document.getElementById("playerPosX").innerHTML = player.pos.x.toFixed(2);
 	document.getElementById("playerPosY").innerHTML = player.pos.y.toFixed(2);
-	document.getElementById("playerVelX").innerHTML = player.vel.x;
-	document.getElementById("playerVelY").innerHTML = player.vel.y;
+	document.getElementById("playerVelX").innerHTML = player.vel.x.toFixed(2);
+	document.getElementById("playerVelY").innerHTML = player.vel.y.toFixed(2);
 
 }
 
