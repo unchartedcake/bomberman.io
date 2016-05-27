@@ -112,7 +112,7 @@ img_box.src = "img/obstacle/box1.png";
 function drawMap() {	// not a good method
 	for(var row = 0; row < settings.gridScale.row; row++)
 		for(var col = 0; col < settings.gridScale.col; col++) {
-			var img = (map[row][col].type == "background")?  img_background : img_box;
+			console.log(map);
 			var type = map[row][col].type;
 			var subType = map[row][col].subType;
 			if(type == "background") {

@@ -1,7 +1,7 @@
-var ip = '192.168.0.6';
+var ip = '192.168.0.3';
 var port = 1234;
 var server = require('http').createServer(handle);
-var io = require('/usr/local/lib/node_modules/socket.io').listen(server);
+var io = require('/Users/cupcake/Desktop/GitHub/bomberman.io/node_modules/socket.io').listen(server);
 var fs = require('fs');
 var path = require('path');
 
@@ -71,7 +71,7 @@ function addTile(row, col, imgSrc) {
 	map[row][col].type = "tile";
 }
 
-function addObstacle(row, col, imgSrc, canBeDestroyed) {
+function addObstacle(row, col, imgSrc) {
 	map[row][col].type = "obstacle";
 	map[row][col].canBeDestroyed = canBeDestroyed;
 }
