@@ -103,11 +103,15 @@ function renderCanvas() {
 }
 
 // NEED TO BE MODIFIED (img.src part)
+var img_background = new Image();
+img_background.src = "img/background.png";
+var img_box = new Image();
+img_box.src = "img/obstacles/box1.png";
+
 function drawMap() {
 	for(var row = 0; row < settings.gridScale.row; row++)
 		for(var col = 0; col < settings.gridScale.col; col++) {
-			var img = new Image();
-			img.src = (map[row][col].type == "background")? "img/background.png" : "img/obstacles/box1.png";
+			var img = (map[row][col].type == "background")?  img_background : img_box;
 			ctx.drawImage(img, col2CoordX(col), row2CoordY(row));
 		}
 }
