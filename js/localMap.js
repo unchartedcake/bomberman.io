@@ -1,24 +1,26 @@
-var map = [];
-for(var row = 0; row < settings.gridScale.row; row++) {
-	map[row] = [];
-	for(var col = 0; col < settings.gridScale.col; col++)
-		map[row][col] = new mapCell();
+function MapCell() {
+	this.type = "background";	// background(default), tile, obstacle
+	this.subType = "none";
 }
 
-
-addTile(3, 10, "grass");
-addTile(4, 7, "grass");
-addObstacle(1, 1, "box1", true);
-addObstacle(6, 7, "box2", true);
-
+var localMap = [];
+for(var row = 0; row < settings.gridScale.row; row++) {
+	localMap[row] = [];
+	for(var col = 0; col < settings.gridScale.col; col++)
+		localMap[row][col] = new MapCell();
+}
 
 function addTile(row, col, subType) {
-	map[row][col].type = "tile";
-	map[row][col].subType = subType;
+	localMap[row][col].type = "tile";
+	localMap[row][col].subType = subType;
 }
 
-function addObstacle(row, col, subType, canBeDestroyed) {
-	map[row][col].type = "obstacle";
-	map[row][col].subType = subType;
-	map[row][col].canBeDestroyed = canBeDestroyed;
+function addObstacle(row, col, subType) {
+	localMap[row][col].type = "obstacle";
+	localMap[row][col].subType = subType;
 }
+
+addObstacle(3, 10, "box");
+addObstacle(4, 7, "box");
+addObstacle(1, 1, "box");
+addObstacle(6, 7, "box");
