@@ -1,8 +1,8 @@
 // connection setting
 var ip, port, socket;
 if(connectionType == "LAN") {	// local/LAN/workstation
-	ip = '192.168.0.3';
-	port = '1234';
+	ip = location.hostname
+	port = location.port;
 	socket = io.connect('http://' + ip + ':' + port);
 }
 

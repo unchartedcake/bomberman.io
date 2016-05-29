@@ -1,7 +1,7 @@
-var ip = '192.168.0.3';
+var ip = '0.0.0.0';
 var port = 1234;
 var server = require('http').createServer(handle);
-var io = require('/Users/cupcake/Desktop/GitHub/bomberman.io/node_modules/socket.io').listen(server);
+var io = require('socket.io').listen(server);
 var fs = require('fs');
 var path = require('path');
 
